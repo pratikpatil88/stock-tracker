@@ -8,7 +8,7 @@ Real-time Data Extraction: Scrapes real-time stock data from Yahoo Finance.
 
 Interactive Visualization: Displays stock data in a web app with responsive charts and tables.
 
-Handling Rate Limiting: Preventing rate limiting or IP blocking from sending too many requests in a short period.
+Handles Rate Limiting: Prevents rate limiting or IP blocking from sending too many requests in a short period.
 
 User-Friendly Interface: Clean, intuitive design ensuring ease of use.
 
