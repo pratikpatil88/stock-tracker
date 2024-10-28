@@ -4,19 +4,25 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import time
 
 # Function to fetch stock data
 def fetch_stock_data(stock_symbol):
     url = f"https://finance.yahoo.com/quote/{stock_symbol}"
     headers = {"User-Agent": "Mozilla/5.0"}
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        return response.text
-    else:
-        st.error(f"Failed to retrieve data for {stock_symbol}")
-        return None
+    # Retry mechanism
+    for attempt in range(3):
+        try:
+            response = requests.get(url, headers=headers, timeout=10)
+            response.raise_for_status()
+            return response.text
+        except requests.exceptions.RequestException as e:
+            st.error(f"Attempt {attempt+1}: Failed to retrieve data for {stock_symbol}")
+            time.sleep(2)  # Wait before retrying
+    
+    return None
 
-# Function to parse stock data
+# Function to parse html stock data
 def parse_stock_data(html_content, stock_symbol):
     soup = BeautifulSoup(html_content, "html.parser")
     price_tag = soup.find("fin-streamer", {"data-field": "regularMarketPrice"})
