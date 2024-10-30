@@ -58,7 +58,7 @@ def parse_stock_data(html_content, stock_symbol):
         return None
 
 # Function to get stock details
-def get_stock_details(stock_symbol, company):
+def get_stock_details(stock_symbol):
     html_content = fetch_stock_data(stock_symbol)
     if html_content:
         return parse_stock_data(html_content, stock_symbol)
@@ -76,7 +76,7 @@ def fetch_stock_symbol(company_name):
     return None
 
 # Streamlit app layout
-st.set_page_config(page_title="Stock Tracker ", layout="centered")
+st.set_page_config(page_title="Stock Tracker 🚀", layout="centered")
 st.markdown(
     """
     <style>
@@ -106,7 +106,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-st.markdown("<h1 class='title'>Stock Insights Dashboard </h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='title'>Stock Insights Dashboard 📈</h1>", unsafe_allow_html=True)
 st.markdown("<h2 class='subheader'>Get real-time stock price updates</h2>", unsafe_allow_html=True)
 
 # Form to handle user input
@@ -121,7 +121,7 @@ if submit_button:
     for company in company_names:
         stock_symbol = fetch_stock_symbol(company)
         if stock_symbol:
-            stock_details = get_stock_details(stock_symbol, company)
+            stock_details = get_stock_details(stock_symbol)
             if stock_details:
                 data.append(stock_details)
         else:
