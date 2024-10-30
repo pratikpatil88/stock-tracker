@@ -17,12 +17,15 @@ def fetch_stock_data(stock_symbol):
             response.raise_for_status()
             return response.text
         except requests.exceptions.RequestException as e:
-            st.error(f"Attempt {attempt+1}: Failed to retrieve data for {stock_symbol}")
+            if attempt == 2:
+                st.error(f"Attempt {attempt+1}: Failed to retrieve data for {company} ({stock_symbol}). Please try again later")
+            else:
+                st.error(f"Attempt {attempt+1}: Failed to retrieve data for {company} ({stock_symbol}).")
             time.sleep(2)  # Wait before retrying
     
     return None
 
-# Function to parse html stock data
+# Function to parse HTML stock data
 def parse_stock_data(html_content, stock_symbol):
     soup = BeautifulSoup(html_content, "html.parser")
     price_tag = soup.find("fin-streamer", {"data-field": "regularMarketPrice"})
@@ -44,17 +47,18 @@ def parse_stock_data(html_content, stock_symbol):
         else:
             volume_str = str(volume)
         return {
+            "company": company,
             "symbol": stock_symbol,
             "price": round(price, 2),
             "change": round(change, 2),
             "volume": volume_str
         }
     else:
-        st.error(f"Failed to find the stock data for {stock_symbol}")
+        st.error(f"Failed to find the stock data for {company} ({stock_symbol})")
         return None
 
 # Function to get stock details
-def get_stock_details(stock_symbol):
+def get_stock_details(stock_symbol, company):
     html_content = fetch_stock_data(stock_symbol)
     if html_content:
         return parse_stock_data(html_content, stock_symbol)
@@ -72,7 +76,7 @@ def fetch_stock_symbol(company_name):
     return None
 
 # Streamlit app layout
-st.set_page_config(page_title="Stock Tracker 🚀", layout="centered")
+st.set_page_config(page_title="Stock Tracker ", layout="centered")
 st.markdown(
     """
     <style>
@@ -102,7 +106,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
-st.markdown("<h1 class='title'>Stock Insights Dashboard 📈</h1>", unsafe_allow_html=True)
+st.markdown("<h1 class='title'>Stock Insights Dashboard </h1>", unsafe_allow_html=True)
 st.markdown("<h2 class='subheader'>Get real-time stock price updates</h2>", unsafe_allow_html=True)
 
 # Form to handle user input
@@ -117,15 +121,16 @@ if submit_button:
     for company in company_names:
         stock_symbol = fetch_stock_symbol(company)
         if stock_symbol:
-            stock_details = get_stock_details(stock_symbol)
+            stock_details = get_stock_details(stock_symbol, company)
             if stock_details:
                 data.append(stock_details)
         else:
             st.warning(f"Could not find stock symbol for {company}")
-
+    
     # Creation of table and plots
     if data:
         df = pd.DataFrame(data)
+        df = df[['company', 'symbol', 'price', 'change', 'volume']]  # Reorder columns
         st.markdown("<h3>Stock Details</h3>", unsafe_allow_html=True)
         
         # Styling DataFrame as HTML
@@ -136,6 +141,6 @@ if submit_button:
         fig = make_subplots(rows=1, cols=1)
         fig.add_trace(go.Bar(x=df['symbol'], y=df['price'], name='Price'))
         fig.add_trace(go.Bar(x=df['symbol'], y=df['change'], name='Change'))
-        #fig.add_trace(go.Bar(x=df['symbol'], y=df['volume'], name='Volume'))
+        # fig.add_trace(go.Bar(x=df['symbol'], y=df['volume'], name='Volume'))
         fig.update_layout(barmode='group', title='Stock Prices and Changes')
         st.plotly_chart(fig)
