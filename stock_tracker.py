@@ -21,7 +21,7 @@ def fetch_stock_data(stock_symbol):
                 st.error(f"Attempt {attempt+1}: Failed to retrieve data for {company} ({stock_symbol}). Please try again later")
             else:
                 st.error(f"Attempt {attempt+1}: Failed to retrieve data for {company} ({stock_symbol}).")
-            time.sleep(2)  # Wait before retrying
+            time.sleep(5)  # Wait before retrying
     
     return None
 
