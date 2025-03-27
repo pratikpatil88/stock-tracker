@@ -28,8 +28,8 @@ def fetch_stock_data(stock_symbol):
 # Function to parse HTML stock data
 def parse_stock_data(html_content, stock_symbol):
     soup = BeautifulSoup(html_content, "html.parser")
-    price_tag = soup.find("fin-streamer", {"data-field": "regularMarketPrice"})
-    change_tag = soup.find("fin-streamer", {"data-field": "regularMarketChange"})
+    price_tag = soup.find("span", {"data-testid": "qsp-price"})
+    change_tag = soup.find("span", {"data-testid": "qsp-price-change"})
     volume_tag = soup.find("fin-streamer", {"data-field": "regularMarketVolume"})
     if price_tag and change_tag and volume_tag:
         price = float(price_tag.text.replace(',', ''))
